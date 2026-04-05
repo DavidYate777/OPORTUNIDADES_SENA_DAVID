@@ -5,147 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SGVA – Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0a0c10; --surface: #111318; --border: #1e2230;
-      --accent: #39d98a; --accent2: #5b8cff; --warn: #f5a623;
-      --danger: #ff5b5b; --text: #e8eaf0; --muted: #6b7280;
-      --card: #13161f; --card2: #0f1117;
-      --st-proceso: #f5a623; --st-finalizado: #5b8cff;
-      --st-contratado: #39d98a; --st-pendiente: #6b7280;
-    }
-    html { scroll-behavior: smooth; }
-    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
-    body::before {
-      content: ''; position: fixed; inset: 0;
-      background:
-        radial-gradient(ellipse 70% 40% at 5% 0%, rgba(57,217,138,.08) 0%, transparent 55%),
-        radial-gradient(ellipse 50% 40% at 95% 100%, rgba(91,140,255,.07) 0%, transparent 55%);
-      pointer-events: none; z-index: 0;
-    }
-    header {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(10,12,16,.85); backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border); padding: 0 2rem;
-      display: flex; align-items: center; justify-content: space-between; height: 64px;
-    }
-    .header-left { display: flex; align-items: center; gap: 1rem; }
-    .logo-pill {
-      display: flex; align-items: center; gap: .5rem;
-      background: rgba(57,217,138,.1); border: 1px solid rgba(57,217,138,.25);
-      border-radius: 99px; padding: .28rem .75rem;
-    }
-    .logo-dot { width:7px; height:7px; background:var(--accent); border-radius:50%; animation: blink 2s ease-in-out infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-    .logo-pill span { font-family:'Syne',sans-serif; font-size:.68rem; font-weight:700; letter-spacing:.1em; color:var(--accent); text-transform:uppercase; }
-    .header-title { font-family:'Syne',sans-serif; font-size:.95rem; font-weight:700; }
-    .header-title small { font-family:'DM Sans',sans-serif; font-size:.78rem; font-weight:400; color:var(--muted); display:block; }
-    .header-right { display:flex; align-items:center; gap:1rem; }
-    .user-chip { display:flex; align-items:center; gap:.6rem; background:var(--surface); border:1px solid var(--border); border-radius:99px; padding:.3rem .9rem .3rem .4rem; }
-    .user-avatar { width:30px; height:30px; border-radius:50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:800; color:#0a0c10; }
-    .user-name { font-size:.85rem; font-weight:500; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .btn-salir { background:transparent; border:1px solid var(--border); color:var(--muted); font-family:'DM Sans',sans-serif; font-size:.82rem; border-radius:8px; padding:.38rem .85rem; cursor:pointer; transition: color .15s, border-color .15s; }
-    .btn-salir:hover { color:var(--danger); border-color:var(--danger); }
-    main { position:relative; z-index:1; max-width:1400px; margin:0 auto; padding:2rem 2rem 4rem; }
-    .stats-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; animation: fadeIn .5s .1s both; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.1rem 1.3rem; display:flex; flex-direction:column; gap:.3rem; transition:border-color .2s; }
-    .stat-card:hover { border-color:rgba(57,217,138,.3); }
-    .stat-label { font-size:.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-weight:500; }
-    .stat-value { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; }
-    .stat-value.green{color:var(--accent)} .stat-value.blue{color:var(--accent2)} .stat-value.orange{color:var(--warn)} .stat-value.grey{color:var(--muted)}
-    .controls { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1.5rem; animation:fadeIn .5s .2s both; }
-    .search-box { flex:1; min-width:220px; background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:.65rem 1rem; color:var(--text); font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none; transition:border-color .2s,box-shadow .2s; }
-    .search-box::placeholder{color:var(--muted)}
-    .search-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(57,217,138,.1)}
-    .filter-btn { background:var(--surface); border:1.5px solid var(--border); color:var(--muted); font-family:'Syne',sans-serif; font-size:.78rem; font-weight:700; letter-spacing:.04em; border-radius:10px; padding:.62rem 1rem; cursor:pointer; transition:all .15s; white-space:nowrap; }
-    .filter-btn:hover,.filter-btn.active{background:var(--card);color:var(--text);border-color:var(--accent)}
-    .filter-btn.f-proceso.active{border-color:var(--st-proceso);color:var(--st-proceso)}
-    .filter-btn.f-finalizado.active{border-color:var(--st-finalizado);color:var(--st-finalizado)}
-    .filter-btn.f-contratado.active{border-color:var(--st-contratado);color:var(--st-contratado)}
-    .table-wrap { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; animation:fadeIn .5s .3s both; }
-    .table-head-bar { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.4rem; border-bottom:1px solid var(--border); }
-    .table-head-bar h2{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700}
-    .count-badge{background:rgba(57,217,138,.1);color:var(--accent);border:1px solid rgba(57,217,138,.2);border-radius:99px;padding:.2rem .65rem;font-size:.75rem;font-weight:700}
-    .table-scroll{overflow-x:auto}
-    table{width:100%;border-collapse:collapse;font-size:.85rem}
-    thead th{background:var(--card2);color:var(--muted);font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.75rem 1rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
-    tbody tr{border-bottom:1px solid rgba(30,34,48,.7);transition:background .15s;cursor:pointer}
-    tbody tr:last-child{border-bottom:none}
-    tbody tr:hover{background:rgba(57,217,138,.04)}
-    td{padding:.8rem 1rem;vertical-align:middle}
-    .td-num{color:var(--muted);font-size:.78rem;width:40px}
-    .td-empresa{font-weight:500;max-width:220px}
-    .empresa-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .empresa-sub{font-size:.75rem;color:var(--muted);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .fecha-range{display:flex;flex-direction:column;gap:.1rem}
-    .fecha-inicio{font-size:.78rem;color:var(--accent)}
-    .fecha-fin{font-size:.78rem;color:var(--muted)}
-    .estado-badge{display:inline-flex;align-items:center;gap:.4rem;border-radius:99px;padding:.28rem .75rem;font-size:.75rem;font-weight:600;letter-spacing:.03em;white-space:nowrap}
-    .estado-badge::before{content:'';width:6px;height:6px;border-radius:50%}
-    .estado-pendiente{background:rgba(107,114,128,.12);color:var(--st-pendiente);border:1px solid rgba(107,114,128,.2)}
-    .estado-pendiente::before{background:var(--st-pendiente)}
-    .estado-proceso{background:rgba(245,166,35,.12);color:var(--st-proceso);border:1px solid rgba(245,166,35,.2)}
-    .estado-proceso::before{background:var(--st-proceso)}
-    .estado-finalizado{background:rgba(91,140,255,.12);color:var(--st-finalizado);border:1px solid rgba(91,140,255,.2)}
-    .estado-finalizado::before{background:var(--st-finalizado)}
-    .estado-contratado{background:rgba(57,217,138,.12);color:var(--st-contratado);border:1px solid rgba(57,217,138,.2)}
-    .estado-contratado::before{background:var(--st-contratado);animation:blink 1.5s ease-in-out infinite}
-    .td-aplicado{text-align:center}
-    .check-aplicado{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);background:transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
-    .check-aplicado.activo{background:var(--accent);border-color:var(--accent)}
-    .check-aplicado.activo::after{content:'✓';color:#0a0c10;font-size:.75rem;font-weight:800}
-    .td-accion{text-align:right}
-    .btn-gestionar{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.04em;border-radius:8px;padding:.35rem .75rem;cursor:pointer;transition:all .15s;white-space:nowrap}
-    .btn-gestionar:hover{border-color:var(--accent2);color:var(--accent2)}
-    .empty-state{text-align:center;padding:4rem 2rem;color:var(--muted)}
-    .empty-state .icon{font-size:2.5rem;margin-bottom:.75rem}
-    .modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(5,7,10,.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .2s}
-    .modal-overlay.open{opacity:1;pointer-events:all}
-    .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;box-shadow:0 40px 100px rgba(0,0,0,.6);transform:scale(.95) translateY(20px);transition:transform .25s cubic-bezier(.16,1,.3,1);overflow:hidden}
-    .modal-overlay.open .modal{transform:scale(1) translateY(0)}
-    .modal-header{padding:1.4rem 1.6rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
-    .modal-empresa{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;line-height:1.3}
-    .modal-contacto{font-size:.82rem;color:var(--muted);margin-top:.3rem}
-    .btn-close{background:var(--surface);border:1px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:8px;font-size:1.1rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:color .15s}
-    .btn-close:hover{color:var(--danger)}
-    .modal-body{padding:1.4rem 1.6rem;display:flex;flex-direction:column;gap:1.2rem}
-    .modal-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
-    .info-item{background:var(--surface);border-radius:10px;padding:.75rem}
-    .info-item label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.3rem}
-    .info-item p{font-size:.84rem;font-weight:500;word-break:break-all}
-    .form-group label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.5rem;font-weight:500}
-    .estado-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
-    .estado-opt{border-radius:10px;padding:.65rem .5rem;text-align:center;cursor:pointer;border:2px solid var(--border);font-size:.78rem;font-weight:600;font-family:'Syne',sans-serif;transition:all .15s;color:var(--muted)}
-    .estado-opt .opt-icon{font-size:1.1rem;display:block;margin-bottom:.2rem}
-    .estado-opt:hover{border-color:var(--muted);color:var(--text)}
-    .estado-opt.selected-proceso{border-color:var(--st-proceso);color:var(--st-proceso);background:rgba(245,166,35,.08)}
-    .estado-opt.selected-finalizado{border-color:var(--st-finalizado);color:var(--st-finalizado);background:rgba(91,140,255,.08)}
-    .estado-opt.selected-contratado{border-color:var(--st-contratado);color:var(--st-contratado);background:rgba(57,217,138,.08)}
-    .aplicado-toggle{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:.8rem 1rem;cursor:pointer;transition:border-color .15s}
-    .aplicado-toggle:hover{border-color:var(--accent)}
-    .aplicado-toggle.on{border-color:var(--accent);background:rgba(57,217,138,.06)}
-    .toggle-label{font-size:.88rem;font-weight:500}
-    .toggle-switch{width:42px;height:24px;border-radius:99px;background:var(--border);position:relative;transition:background .2s;flex-shrink:0}
-    .toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
-    .aplicado-toggle.on .toggle-switch{background:var(--accent)}
-    .aplicado-toggle.on .toggle-switch::after{transform:translateX(18px)}
-    textarea{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:.8rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;resize:vertical;min-height:100px;transition:border-color .2s,box-shadow .2s}
-    textarea::placeholder{color:var(--muted)}
-    textarea:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(91,140,255,.1)}
-    .modal-footer{padding:.75rem 1.6rem 1.4rem;display:flex;gap:.75rem;justify-content:flex-end}
-    .btn-cancelar{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;border-radius:10px;padding:.6rem 1.2rem;cursor:pointer;transition:color .15s,border-color .15s}
-    .btn-cancelar:hover{color:var(--danger);border-color:var(--danger)}
-    .btn-guardar{background:var(--accent);color:#0a0c10;font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;border:none;border-radius:10px;padding:.65rem 1.5rem;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 18px rgba(57,217,138,.25)}
-    .btn-guardar:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(57,217,138,.4)}
-    .toast{position:fixed;bottom:2rem;right:2rem;z-index:999;background:var(--card);border:1px solid var(--accent);border-radius:12px;padding:.8rem 1.2rem;font-size:.85rem;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.4);display:flex;align-items:center;gap:.6rem;transform:translateY(20px);opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);pointer-events:none}
-    .toast.show{transform:translateY(0);opacity:1}
-    @media(max-width:768px){main{padding:1rem 1rem 3rem}.stats-bar{grid-template-columns:repeat(2,1fr)}header{padding:0 1rem}.header-title small{display:none}}
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+<!-- HEADER -->
 <header>
   <div class="header-left">
     <div class="logo-pill"><div class="logo-dot"></div><span>SGVA</span></div>
@@ -159,13 +24,34 @@
     <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
   </div>
 </header>
+
 <main>
+
+  <!-- STATS -->
   <div class="stats-bar">
     <div class="stat-card"><span class="stat-label">Total empresas</span><span class="stat-value green" id="stat-total">0</span></div>
     <div class="stat-card"><span class="stat-label">Aplicadas</span><span class="stat-value blue" id="stat-aplicadas">0</span></div>
     <div class="stat-card"><span class="stat-label">En proceso</span><span class="stat-value orange" id="stat-proceso">0</span></div>
     <div class="stat-card"><span class="stat-label">Contratado</span><span class="stat-value grey" id="stat-contratado">0</span></div>
   </div>
+
+  <!-- TABS DE SECCIÓN -->
+  <div class="section-tabs">
+    <button class="tab-btn active" onclick="cambiarSeccion(1)" id="tab-1">
+      <span class="tab-num">01</span> Sección 1
+      <span class="tab-count" id="tc-1"></span>
+    </button>
+    <button class="tab-btn" onclick="cambiarSeccion(2)" id="tab-2">
+      <span class="tab-num">02</span> Sección 2
+      <span class="tab-count" id="tc-2"></span>
+    </button>
+    <button class="tab-btn" onclick="cambiarSeccion(3)" id="tab-3">
+      <span class="tab-num">03</span> Sección 3
+      <span class="tab-count" id="tc-3"></span>
+    </button>
+  </div>
+
+  <!-- CONTROLES -->
   <div class="controls">
     <input class="search-box" type="text" id="buscador" placeholder="🔍  Buscar empresa, contacto o correo..." oninput="filtrar()"/>
     <button class="filter-btn active" onclick="filtrarEstado('todos')" id="f-todos">Todos</button>
@@ -173,11 +59,14 @@
     <button class="filter-btn f-finalizado" onclick="filtrarEstado('finalizado')" id="f-finalizado">Finalizado</button>
     <button class="filter-btn f-contratado" onclick="filtrarEstado('contratado')" id="f-contratado">Contratado</button>
     <button class="filter-btn" onclick="filtrarEstado('aplicadas')" id="f-aplicadas">Aplicadas ✓</button>
+    <button class="btn-agregar" onclick="abrirModalAgregar()">+ Agregar empresa</button>
   </div>
+
+  <!-- TABLA -->
   <div class="table-wrap">
     <div class="table-head-bar">
-      <h2>Registro de Empresas</h2>
-      <span class="count-badge" id="count-visible">67 empresas</span>
+      <h2 id="table-title">Sección 1</h2>
+      <span class="count-badge" id="count-visible">0 empresas</span>
     </div>
     <div class="table-scroll">
       <table>
@@ -193,6 +82,7 @@
   </div>
 </main>
 
+<!-- MODAL GESTIONAR -->
 <div class="modal-overlay" id="modal-overlay" onclick="cerrarModalOverlay(event)">
   <div class="modal">
     <div class="modal-header">
@@ -209,22 +99,22 @@
         <div class="info-item" style="grid-column:1/-1"><label>Correo</label><p id="m-correo">—</p></div>
       </div>
       <div>
-        <label class="form-group" style="margin-bottom:.5rem"><span style="font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500">¿Ya apliqué?</span></label>
+        <p class="form-label">¿Ya apliqué?</p>
         <div class="aplicado-toggle" id="toggle-aplicado" onclick="toggleAplicado()">
           <span class="toggle-label" id="toggle-label">No he aplicado aún</span>
           <div class="toggle-switch"></div>
         </div>
       </div>
-      <div class="form-group">
-        <label>Estado de la aplicación</label>
+      <div>
+        <p class="form-label">Estado de la aplicación</p>
         <div class="estado-selector">
           <div class="estado-opt" id="opt-proceso" onclick="selEstado('proceso')"><span class="opt-icon">⏳</span>En proceso</div>
           <div class="estado-opt" id="opt-finalizado" onclick="selEstado('finalizado')"><span class="opt-icon">✅</span>Finalizado</div>
           <div class="estado-opt" id="opt-contratado" onclick="selEstado('contratado')"><span class="opt-icon">🎉</span>Contratado</div>
         </div>
       </div>
-      <div class="form-group">
-        <label>Notas / Descripción personal</label>
+      <div>
+        <p class="form-label">Notas / Descripción personal</p>
         <textarea id="modal-desc" placeholder="Escribe tus notas sobre esta oportunidad..."></textarea>
       </div>
     </div>
@@ -235,197 +125,67 @@
   </div>
 </div>
 
+<!-- MODAL AGREGAR EMPRESA -->
+<div class="modal-overlay" id="modal-agregar-overlay" onclick="cerrarModalAgregarOverlay(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-empresa">➕ Agregar nueva empresa</div>
+        <div class="modal-contacto">Los campos marcados con * son obligatorios</div>
+      </div>
+      <button class="btn-close" onclick="cerrarModalAgregar()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info-grid">
+        <div class="info-item" style="grid-column:1/-1">
+          <label>Empresa *</label>
+          <input type="text" class="input-modal" id="add-empresa" placeholder="Nombre de la empresa"/>
+        </div>
+        <div class="info-item">
+          <label>Persona de contacto</label>
+          <input type="text" class="input-modal" id="add-contacto" placeholder="Nombre del contacto"/>
+        </div>
+        <div class="info-item">
+          <label>Teléfono</label>
+          <input type="text" class="input-modal" id="add-telefono" placeholder="Número"/>
+        </div>
+        <div class="info-item" style="grid-column:1/-1">
+          <label>Correo</label>
+          <input type="text" class="input-modal" id="add-correo" placeholder="correo@empresa.com"/>
+        </div>
+        <div class="info-item" style="grid-column:1/-1">
+          <label>Dirección</label>
+          <input type="text" class="input-modal" id="add-direccion" placeholder="Dirección de la empresa"/>
+        </div>
+        <div class="info-item">
+          <label>Fecha inicio *</label>
+          <input type="date" class="input-modal" id="add-inicio"/>
+        </div>
+        <div class="info-item">
+          <label>Fecha fin *</label>
+          <input type="date" class="input-modal" id="add-fin"/>
+        </div>
+        <div class="info-item" style="grid-column:1/-1">
+          <label>Sección *</label>
+          <select class="input-modal" id="add-seccion">
+            <option value="1">Sección 1</option>
+            <option value="2">Sección 2</option>
+            <option value="3">Sección 3</option>
+          </select>
+        </div>
+      </div>
+      <p class="error-msg" id="error-agregar" style="display:none">Por favor completa los campos obligatorios.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="cerrarModalAgregar()">Cancelar</button>
+      <button class="btn-guardar" onclick="guardarNuevaEmpresa()">Agregar empresa</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
 <div class="toast" id="toast"><span>✓</span><span id="toast-msg">Guardado</span></div>
 
-<script>
-const EMPRESAS = [
-  {id:1,empresa:"VC@SOFT S A S",contacto:"Michell Gonzalez",direccion:"Cll 100 No. 17 A 36 Ofc 601",telefono:"6219348",correo:"sg-sst@vc-soft.com",fechaInicio:"03/03/2026",fechaFin:"31/12/2026"},
-  {id:2,empresa:"INFORMATION WORKERS S.A.S",contacto:"VIVIANA LOZANO",direccion:"cra 13 93-35",telefono:"3208587339",correo:"recursohumano@iwco.co",fechaInicio:"03/03/2026",fechaFin:"30/04/2026"},
-  {id:3,empresa:"GENSER POWER COLOMBIA",contacto:"Julian Andres Castañeda",direccion:"calle 100 13-21",telefono:"3102522520",correo:"Julian.castaneda@genserpower.com",fechaInicio:"04/03/2026",fechaFin:"19/08/2026"},
-  {id:4,empresa:"VASS CONSULTORIA DE SISTEMAS COLOMBIA S A S",contacto:"Carrolina Molano",direccion:"Carrera 7 No. 76-57",telefono:"3142356122",correo:"carolina.molano@vasscompany.com",fechaInicio:"04/03/2026",fechaFin:"31/05/2026"},
-  {id:5,empresa:"CONTINENTAL ASSIST COLOMBIA S A S",contacto:"N/A",direccion:"Autopista Norte 114-44",telefono:"3172759174",correo:"lrojas@continentalassist.com",fechaInicio:"05/03/2026",fechaFin:"30/06/2026"},
-  {id:6,empresa:"ENFRAGEN COLOMBIA SAS",contacto:"Dahyana Hernandez",direccion:"Carrera 11 79-35",telefono:"3162868845",correo:"dahyana.hernandez@enfragen.com",fechaInicio:"05/03/2026",fechaFin:"07/08/2026"},
-  {id:7,empresa:"TICSOCIAL SAS",contacto:"Tiffany Galindo",direccion:"calle 26 a 13-97 Edificio Bulevar Tequendama",telefono:"3160259088",correo:"nomina@ticsocial.com.co",fechaInicio:"06/03/2026",fechaFin:"30/04/2026"},
-  {id:8,empresa:"NTT DATA COLOMBIA S.A.S.",contacto:"N/A",direccion:"N/A",telefono:"N/A",correo:"mariaisabel.rodriguezarias@nttdata.com",fechaInicio:"09/03/2026",fechaFin:"30/04/2026"},
-  {id:9,empresa:"JAZZPLAT COLOMBIA S A S",contacto:"Alejandro Sanchez",direccion:"CARRERA 56 9 09",telefono:"3167139467",correo:"cristianalejandr.jcol@masorange.es",fechaInicio:"10/03/2026",fechaFin:"04/04/2026"},
-  {id:10,empresa:"UNIVERSIDAD ANTONIO NARIÑO",contacto:"Julian David Amortegui",direccion:"UNIVERSIDAD ANTONIO NARIÑO",telefono:"3017875128",correo:"profesional.gestion.humana2@uan.edu.co",fechaInicio:"10/03/2026",fechaFin:"30/04/2026"},
-  {id:11,empresa:"TECPETROL COLOMBIA SAS",contacto:"Maria José Vargas",direccion:"Calle 113 7-80",telefono:"3570000",correo:"tecpetrolrh-colombia@tecpetrol.com",fechaInicio:"10/03/2026",fechaFin:"31/05/2026"},
-  {id:12,empresa:"ADO TECHNOLOGIES COLOMBIA SAS",contacto:"JESSICA MONTAÑA",direccion:"CALLE 93 16 46",telefono:"3197157728",correo:"ADMINISTRACION@ADO-TECH.COM",fechaInicio:"10/03/2026",fechaFin:"10/04/2026"},
-  {id:13,empresa:"INDUSTRIA MILITAR",contacto:"JOHANA BONILLA",direccion:"BOGOTA (NO ESPECIFICA)",telefono:"207800",correo:"nini.bonilla@indumil.gov.co",fechaInicio:"11/03/2026",fechaFin:"10/04/2026"},
-  {id:14,empresa:"COOPERATIVA DE AHORRO Y CREDITO BENEFICIAR",contacto:"BERTHA ROCIO SIERRA LIZARAZO",direccion:"CRA 7 No 34 - 22",telefono:"7490001",correo:"analistath@beneficiar.com.co",fechaInicio:"12/03/2026",fechaFin:"07/04/2026"},
-  {id:15,empresa:"IDENTIDAD TELECOM SAS",contacto:"Hernando Reyes Cortes",direccion:"Cra 19 82-14",telefono:"3173995356",correo:"hreyes@identidadtech.com",fechaInicio:"12/03/2026",fechaFin:"16/04/2026"},
-  {id:16,empresa:"SOPORTE Y LOGISTICA S.A.S",contacto:"JORGE BONILLA",direccion:"cl 93 15 59",telefono:"8540204",correo:"JORGEB@GROWER2BUYER.COM",fechaInicio:"13/03/2026",fechaFin:"30/06/2026"},
-  {id:17,empresa:"GESTION PROFESIONAL EN SOLUCIONES INTEGRALES LTDA",contacto:"Misdalia",direccion:"carrera58b bis128b 50",telefono:"3214527570",correo:"contratacion.gpsi@gmail.com",fechaInicio:"13/03/2026",fechaFin:"30/04/2026"},
-  {id:18,empresa:"WORLD VISION INTERNATIONAL",contacto:"N/A",direccion:"N/A",telefono:"N/A",correo:"nicolas_gambasica@wvi.org",fechaInicio:"13/03/2026",fechaFin:"22/04/2026"},
-  {id:19,empresa:"SQDM S A S",contacto:"JHOANA GERALDYNE ROBLES",direccion:"Cl. 31 13A - 51",telefono:"3183733929",correo:"JhoanaRobles@sqdm.com",fechaInicio:"16/03/2026",fechaFin:"10/04/2026"},
-  {id:20,empresa:"INSTALEAP S.A.S.",contacto:"Sonia Gonzalez",direccion:"calle 92 no. 15-78",telefono:"3157672175",correo:"sonia.gonzalez@instaleap.io",fechaInicio:"16/03/2026",fechaFin:"21/04/2026"},
-  {id:21,empresa:"MULLEN LOWE SSP3 S.A.S",contacto:"YURANI HERNANDEZ",direccion:"KR 9 79A 19",telefono:"3102055089",correo:"yurani.hernandez@mullenloweholding.com",fechaInicio:"16/03/2026",fechaFin:"28/05/2026"},
-  {id:22,empresa:"E-SOMOS ALIMENTACIÓN SAS",contacto:"N/A",direccion:"KR 14 139 SUR - 64",telefono:"3176355129",correo:"aux_gestionhumana_esa@e-somos.co",fechaInicio:"17/03/2026",fechaFin:"30/04/2026"},
-  {id:23,empresa:"ELITE LOGISTICA Y RENDIMIENTO SAS",contacto:"Michel",direccion:"Av esperanza 96-10",telefono:"3156126912",correo:"N/A",fechaInicio:"17/03/2026",fechaFin:"31/12/2026"},
-  {id:24,empresa:"HIKVISION COLOMBIA S.A.S.",contacto:"Sebastian Chaparro",direccion:"Calle 116 No. 21-50 Piso 7",telefono:"3102105864",correo:"sebastian.chaparro@hikvision.com",fechaInicio:"18/03/2026",fechaFin:"20/04/2026"},
-  {id:25,empresa:"ENERGITEL S.A.S",contacto:"Magda Garcia",direccion:"cra 25 N 68-64",telefono:"3401297",correo:"gestionhumana@energitel.com",fechaInicio:"18/03/2026",fechaFin:"08/04/2026"},
-  {id:26,empresa:"YES CONTACT & BPO S.A.S.",contacto:"HEIDY MORA",direccion:"CL 124 45 15",telefono:"3046687878",correo:"RECURSOS@YESBPO.CO",fechaInicio:"18/03/2026",fechaFin:"30/04/2026"},
-  {id:27,empresa:"KIBERNUM SAS",contacto:"Angelica Prieto",direccion:"carrera 13 98 21",telefono:"3160258333",correo:"angelica.prieto@kibernum.com.co",fechaInicio:"19/03/2026",fechaFin:"21/04/2026"},
-  {id:28,empresa:"PROTELA S.A.",contacto:"Dayana Carrillo",direccion:"Transversal 93 65A-82",telefono:"3176469157",correo:"dayana.carrillo@protela.com",fechaInicio:"19/03/2026",fechaFin:"30/04/2026"},
-  {id:29,empresa:"INDIGO PARK COLOMBIA S.A.S.",contacto:"Yudi Guerrero",direccion:"Calle 97a 9a 50",telefono:"3163372495",correo:"seleccion@city-parking.com",fechaInicio:"19/03/2026",fechaFin:"30/04/2026"},
-  {id:30,empresa:"FIDUCIARIA LA PREVISORA - FIDUPREVISORA",contacto:"Paula Andrea Sanchez Chaparo",direccion:"CALLE 72 10 03",telefono:"7566633",correo:"sya_psanchez@fiduprevisora.com.co",fechaInicio:"19/03/2026",fechaFin:"10/04/2026"},
-  {id:31,empresa:"EKOOMEDIA S.A.S",contacto:"Laura Rodríguez",direccion:"Cra 19 95 55",telefono:"(601) 8052584",correo:"talento@ekoomedia.com",fechaInicio:"20/03/2026",fechaFin:"10/04/2026"},
-  {id:32,empresa:"SATELCO INTERACTIVO S.A.S.",contacto:"Paula Camero",direccion:"CR 45 No 122 56",telefono:"3106780673",correo:"pcamerofr@gmail.com",fechaInicio:"20/03/2026",fechaFin:"30/04/2026"},
-  {id:33,empresa:"KOA COMPAÑIA DE FINANCIAMIENTO S.A",contacto:"Valentina Bustos Hernadez",direccion:"Carrera 14 No 93 a - 30",telefono:"318 358841",correo:"vbustos@koa.co",fechaInicio:"20/03/2026",fechaFin:"30/04/2026"},
-  {id:34,empresa:"NUEVA EPS S.A.",contacto:"Nathaly Ramirez",direccion:"Cra. 85 K 46A - 66",telefono:"4193000",correo:"nathaly.ramirez@nuevaeps.com.co",fechaInicio:"20/03/2026",fechaFin:"17/04/2026"},
-  {id:35,empresa:"AMWELL COLOMBIA SAS",contacto:"Diana Espinosa",direccion:"N/A",telefono:"3017717140",correo:"diana.espinosa@amwell.com",fechaInicio:"20/03/2026",fechaFin:"31/05/2026"},
-  {id:36,empresa:"SIMIL TECH SAS",contacto:"Alba Luz Peña Arias",direccion:"Calle 127 A No. 46 - 81",telefono:"3114593527",correo:"info@similtech.co",fechaInicio:"24/03/2026",fechaFin:"15/04/2026"},
-  {id:37,empresa:"NETACTICA COLOMBIA SAS",contacto:"CAROLINA HERNANDEZ",direccion:"cra 15 88 21",telefono:"3185713623",correo:"admcolombia@netactica.com",fechaInicio:"25/03/2026",fechaFin:"06/04/2026"},
-  {id:38,empresa:"GESTION DE SEGURIDAD ELECTRONICA - GSE SA",contacto:"Natalia Gutierrez",direccion:"Carrera 7 77-07",telefono:"3143425044",correo:"gina.gutierrez@paynet.com.co",fechaInicio:"25/03/2026",fechaFin:"10/04/2026"},
-  {id:39,empresa:"FUNDACION UNIVERSITARIA MONSERRATE",contacto:"Marta Lucia Gomez",direccion:"CLL 68 62 - 11",telefono:"6013902202",correo:"psicologiagho@unimonserrate.edu.co",fechaInicio:"25/03/2026",fechaFin:"10/04/2026"},
-  {id:40,empresa:"DISTRICARGO OPERATIONS S A COLOMBIA",contacto:"Lady Varon",direccion:"Cra. 106 15 25 Manzana22 Bodega 134c",telefono:"3143347969",correo:"lady.varon@grupodistri.com",fechaInicio:"25/03/2026",fechaFin:"15/04/2026"},
-  {id:41,empresa:"HIGH TECH SOFTWARE S.A.S",contacto:"N/A",direccion:"cll 72 7 21",telefono:"322 8744573",correo:"Nathaly.garzon@blend360.com",fechaInicio:"25/03/2026",fechaFin:"30/04/2026"},
-  {id:42,empresa:"DATAICO S.A.S",contacto:"Valentina Rincon",direccion:"CL 24 24-65",telefono:"3202404889",correo:"seleccion@dataico.com",fechaInicio:"25/03/2026",fechaFin:"25/04/2026"},
-  {id:43,empresa:"INFOTRANS COLOMBIA SAS",contacto:"Sandra Bocanegra",direccion:"CL 26 85 D 55 Modulo 7",telefono:"7433281",correo:"sandra.bocanegra@pbs.group",fechaInicio:"25/03/2026",fechaFin:"07/04/2026"},
-  {id:44,empresa:"S A C SEGURIDAD AUTOMATIZACION Y CONTROL S.A.S",contacto:"JOHANNA GOMEZ",direccion:"PARQUE EMPRESARIAL OIKOS CIEM OCCIDENTE",telefono:"3160244516",correo:"jgomez@sactecnologia.com",fechaInicio:"25/03/2026",fechaFin:"30/04/2026"},
-  {id:45,empresa:"SIEMENS S. A.",contacto:"Juan Hernandez",direccion:"Torre Fura",telefono:"3107741155",correo:"juan.hernandez_perico@siemens.com",fechaInicio:"25/03/2026",fechaFin:"09/04/2026"},
-  {id:46,empresa:"SOAIN SOFTWARE ASSOCIATES S A S",contacto:"Sofia Ruiz",direccion:"Calle 100 No 23 10",telefono:"3118013390",correo:"pruiz@soaint.com",fechaInicio:"25/03/2026",fechaFin:"06/04/2026"},
-  {id:47,empresa:"COMSISTELCO S.A.S.",contacto:"Paola Andrea Bernal",direccion:"Carrera 20C 75A-27",telefono:"3157803480",correo:"talentohumano@comsistelco.com",fechaInicio:"26/03/2026",fechaFin:"25/04/2026"},
-  {id:48,empresa:"Q-VISION (QUALITY VISION TECHNOLOGIES) S.A.",contacto:"sara orozco",direccion:"Edificio Zenn Office Cl. 93 16-46 Ofc. 404 B",telefono:"3017569685",correo:"sorozco@qvision.us",fechaInicio:"26/03/2026",fechaFin:"17/04/2026"},
-  {id:49,empresa:"CABIFY SERVICIOS TN S.A.S.",contacto:"Alvaro riaño",direccion:"N/A",telefono:"3166203444",correo:"people@cabify.com",fechaInicio:"26/03/2026",fechaFin:"17/04/2026"},
-  {id:50,empresa:"UNIDAD MEDICA Y DE DIAGNOSTICO S A",contacto:"Viviana Brochero",direccion:"Calle 93 19 - 25",telefono:"3157946165",correo:"yisselvbh@colmedica.com",fechaInicio:"27/03/2026",fechaFin:"30/04/2026"},
-  {id:51,empresa:"CORPORACION COLOMBIANA DE LOGISTICA - C.C.L. S.A.",contacto:"CORPORACION COLOMBIANA DE LOGISTICA",direccion:"AV CALLE 22 68B-75",telefono:"3134880256",correo:"seleccion@ccl.com.co",fechaInicio:"27/03/2026",fechaFin:"09/04/2026"},
-  {id:52,empresa:"FALABELLA SERVICIOS SAS",contacto:"Alejandra Rodriguez",direccion:"Calle 99 - 15",telefono:"3132009758",correo:"mrodriguezni@falabella.com.co",fechaInicio:"27/03/2026",fechaFin:"10/04/2026"},
-  {id:53,empresa:"FUNDACIÓN ORIÉNTAME",contacto:"Maria Camila Gutierrez Sanchez",direccion:"calle 33 a no 16 - 55",telefono:"3217561326",correo:"cgutierrez@orientame.org.co",fechaInicio:"27/03/2026",fechaFin:"06/04/2026"},
-  {id:54,empresa:"ARTEMISA TECH SAS",contacto:"ALEJANDRA BOHORQUEZ",direccion:"calle 75 54 13",telefono:"3209213208",correo:"contabilidad@artemisa.tech",fechaInicio:"27/03/2026",fechaFin:"10/04/2026"},
-  {id:55,empresa:"PLANTACIONES UNIPALMA DE LOS LLANOS S.A.",contacto:"N/A",direccion:"KM 23 VIA CUMARAL VERACRUZ",telefono:"3115926410",correo:"CAMILA.AMADOR@UNIPALMA.COM",fechaInicio:"30/03/2026",fechaFin:"09/04/2026"},
-  {id:56,empresa:"UNIQUE ARQUITECTURA Y DISEÑO SAS",contacto:"Alejandra Rodriguez",direccion:"cra 51 73 46",telefono:"3165626467",correo:"recursoshumanos@uniqueconcept.com.co",fechaInicio:"30/03/2026",fechaFin:"30/05/2026"},
-  {id:57,empresa:"SOFTWARE QUALITY ASSURANCE S.A.",contacto:"Karen Torres",direccion:"Hotel tequendama",telefono:"3102452950",correo:"talentos1.sqa@sqasa.co",fechaInicio:"30/03/2026",fechaFin:"30/04/2026"},
-  {id:58,empresa:"LER PREVENCIÓN LTDA",contacto:"Lina Enciso",direccion:"Av Cra 9 123- 86 oficina 604",telefono:"3171758382",correo:"linaenciso@lerprevencion.com",fechaInicio:"31/03/2026",fechaFin:"21/04/2026"},
-  {id:59,empresa:"EMPRESA PRUEBA DISTRITO CAPITAL",contacto:"diana sarmiento",direccion:"carrera 13 65-10",telefono:"310000000",correo:"diana@gmail.com",fechaInicio:"31/03/2026",fechaFin:"20/05/2026"},
-  {id:60,empresa:"LEGIS EDITORES S.A.",contacto:"lorena Pérez Páez",direccion:"Calle 94 13-72",telefono:"3102146154",correo:"lorena.perz@gmail.com",fechaInicio:"31/03/2026",fechaFin:"17/04/2026"},
-  {id:61,empresa:"MERIDIAN CONSULTING LTDA",contacto:"LADY LORENA VINCHERY",direccion:"CALLE 67 7 35",telefono:"7469090",correo:"auxiliargh@meridian.com.co",fechaInicio:"31/03/2026",fechaFin:"18/04/2026"},
-  {id:62,empresa:"PERSOM EMPRESA DE SERVICIOS TEMPORALES S.A.S",contacto:"ALEJANDRO GAITAN",direccion:"CR 27C 70 12",telefono:"3160106942",correo:"seleccion@persom.co",fechaInicio:"01/04/2026",fechaFin:"24/04/2026"},
-  {id:63,empresa:"TRYCORE SAS",contacto:"Talento Humano",direccion:"Torre Colpatria Cra. 7 24-89 Piso 35-02",telefono:"1111111",correo:"samuel.guerrero@trycore.com.co",fechaInicio:"01/04/2026",fechaFin:"05/05/2026"},
-  {id:64,empresa:"BESEDO SUCURSAL COLOMBIA",contacto:"maria ramirez",direccion:"KR 10 97 A - 13 ED BOGOTA ET 606",telefono:"3244541807",correo:"maria.ramirez@besedo.com",fechaInicio:"01/04/2026",fechaFin:"31/07/2026"},
-  {id:65,empresa:"CANAL CLIMA S A S",contacto:"MAYERLI FORERO",direccion:"CRA 11 B No 99- 25 PISO 10 EDIFICIO WEWORK",telefono:"3245162812",correo:"mayerli.forero@canalclima.com",fechaInicio:"01/04/2026",fechaFin:"31/05/2026"},
-  {id:66,empresa:"LOGISMART SOLUCIONES INTELIGENTES DE LOGISTICA SAS",contacto:"Alexandra cardenas",direccion:"Av calle 12 79 A 25",telefono:"3213355801",correo:"yudy.cardenas@pharex.co",fechaInicio:"01/04/2026",fechaFin:"10/04/2026"},
-  {id:67,empresa:"BIOTRONITECH COLOMBIA S.A.S",contacto:"Diana Duarte",direccion:"calle 123 N 7 - 50",telefono:"3160185694",correo:"asis.talentohumano@biotronitech.com.co",fechaInicio:"01/04/2026",fechaFin:"30/04/2026"}
-];
-
-let usuario='', registros={}, filtroActivo='todos', modalId=null, modalEstado=null, modalAplicado=false;
-
-window.addEventListener('DOMContentLoaded', () => {
-  usuario = localStorage.getItem('sgva_usuario');
-  if (!usuario) { window.location.href = 'index.html'; return; }
-  const raw = localStorage.getItem('sgva_registros');
-  registros = raw ? JSON.parse(raw) : {};
-  document.getElementById('nombre-usuario').textContent = usuario;
-  document.getElementById('avatar-initial').textContent = usuario.charAt(0).toUpperCase();
-  renderTabla(); actualizarStats();
-});
-
-function guardar() { localStorage.setItem('sgva_registros', JSON.stringify(registros)); }
-function getReg(id) { return registros[id] || { aplicado:false, estado:null, descripcion:'' }; }
-
-function renderTabla() {
-  const busq  = document.getElementById('buscador').value.toLowerCase();
-  const tbody = document.getElementById('tabla-body');
-  const filtradas = EMPRESAS.filter(e => {
-    const texto = `${e.empresa} ${e.contacto} ${e.correo}`.toLowerCase();
-    if (busq && !texto.includes(busq)) return false;
-    const reg = getReg(e.id);
-    if (filtroActivo==='aplicadas')  return reg.aplicado;
-    if (filtroActivo==='proceso')    return reg.estado==='proceso';
-    if (filtroActivo==='finalizado') return reg.estado==='finalizado';
-    if (filtroActivo==='contratado') return reg.estado==='contratado';
-    return true;
-  });
-  document.getElementById('count-visible').textContent = `${filtradas.length} empresa${filtradas.length!==1?'s':''}`;
-  if (!filtradas.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="icon">🔍</div>No se encontraron empresas.</div></td></tr>`;
-    return;
-  }
-  const labels = {pendiente:'Sin estado',proceso:'En proceso',finalizado:'Finalizado',contratado:'Contratado'};
-  tbody.innerHTML = filtradas.map((e,i) => {
-    const reg = getReg(e.id); const est = reg.estado||'pendiente';
-    return `<tr onclick="abrirModal(${e.id})">
-      <td class="td-num">${i+1}</td>
-      <td class="td-empresa"><div class="empresa-name" title="${e.empresa}">${e.empresa}</div><div class="empresa-sub">${e.correo}</div></td>
-      <td>${e.contacto}</td><td>${e.telefono}</td>
-      <td><div class="fecha-range"><span class="fecha-inicio">↑ ${e.fechaInicio}</span><span class="fecha-fin">↓ ${e.fechaFin}</span></div></td>
-      <td class="td-aplicado" onclick="event.stopPropagation();toggleAplicadoDirecto(${e.id})">
-        <div class="check-aplicado ${reg.aplicado?'activo':''}"></div>
-      </td>
-      <td><span class="estado-badge estado-${est}">${labels[est]}</span></td>
-      <td class="td-accion" onclick="event.stopPropagation();abrirModal(${e.id})"><button class="btn-gestionar">Gestionar →</button></td>
-    </tr>`;
-  }).join('');
-}
-
-function actualizarStats() {
-  const vals = Object.values(registros);
-  document.getElementById('stat-total').textContent      = EMPRESAS.length;
-  document.getElementById('stat-aplicadas').textContent  = vals.filter(r=>r.aplicado).length;
-  document.getElementById('stat-proceso').textContent    = vals.filter(r=>r.estado==='proceso').length;
-  document.getElementById('stat-contratado').textContent = vals.filter(r=>r.estado==='contratado').length;
-}
-
-function filtrar() { renderTabla(); }
-function filtrarEstado(estado) {
-  filtroActivo = estado;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(`f-${estado}`)?.classList.add('active');
-  renderTabla();
-}
-
-function toggleAplicadoDirecto(id) {
-  const reg = getReg(id); reg.aplicado = !reg.aplicado; registros[id]=reg;
-  guardar(); renderTabla(); actualizarStats();
-  mostrarToast(reg.aplicado?'✓ Marcada como aplicada':'Marca removida');
-}
-
-function abrirModal(id) {
-  const emp=EMPRESAS.find(e=>e.id===id), reg=getReg(id);
-  modalId=id; modalEstado=reg.estado; modalAplicado=reg.aplicado;
-  document.getElementById('m-empresa').textContent = emp.empresa;
-  document.getElementById('m-contacto').textContent = `👤 ${emp.contacto}  ·  ✉ ${emp.correo}`;
-  document.getElementById('m-dir').textContent  = emp.direccion;
-  document.getElementById('m-tel').textContent  = emp.telefono;
-  document.getElementById('m-correo').textContent = emp.correo;
-  document.getElementById('modal-desc').value   = reg.descripcion||'';
-  actualizarToggleUI(); actualizarEstadoUI();
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function cerrarModal() { document.getElementById('modal-overlay').classList.remove('open'); modalId=null; }
-function cerrarModalOverlay(e) { if(e.target===document.getElementById('modal-overlay')) cerrarModal(); }
-
-function toggleAplicado() { modalAplicado=!modalAplicado; actualizarToggleUI(); }
-function actualizarToggleUI() {
-  const t=document.getElementById('toggle-aplicado'), l=document.getElementById('toggle-label');
-  modalAplicado ? (t.classList.add('on'), l.textContent='¡Ya apliqué a esta empresa!') : (t.classList.remove('on'), l.textContent='No he aplicado aún');
-}
-
-function selEstado(estado) { modalEstado = modalEstado===estado ? null : estado; actualizarEstadoUI(); }
-function actualizarEstadoUI() {
-  ['proceso','finalizado','contratado'].forEach(s => {
-    const el=document.getElementById(`opt-${s}`);
-    el.className='estado-opt';
-    if(modalEstado===s) el.classList.add(`selected-${s}`);
-  });
-}
-
-function guardarModal() {
-  if(!modalId) return;
-  registros[modalId]={ aplicado:modalAplicado, estado:modalEstado, descripcion:document.getElementById('modal-desc').value.trim() };
-  guardar(); renderTabla(); actualizarStats(); cerrarModal();
-  mostrarToast('✓ Cambios guardados correctamente');
-}
-
-let toastTimer;
-function mostrarToast(msg) {
-  const t=document.getElementById('toast');
-  document.getElementById('toast-msg').textContent=msg;
-  t.classList.add('show'); clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
-}
-
-function cerrarSesion() { localStorage.removeItem('sgva_usuario'); window.location.href='index.html'; }
-</script>
+<script src="app.js"></script>
 </body>
 </html>
